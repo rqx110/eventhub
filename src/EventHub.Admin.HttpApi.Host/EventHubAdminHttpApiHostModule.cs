@@ -10,13 +10,11 @@ using EventHub.Web;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using StackExchange.Redis;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Basic;
@@ -25,7 +23,6 @@ using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
 using Volo.Abp.BackgroundJobs;
 using Volo.Abp.Caching;
-using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
 using Volo.Abp.Swashbuckle;
@@ -38,7 +35,6 @@ namespace EventHub.Admin
         typeof(EventHubAdminHttpApiModule),
         typeof(EventHubEntityFrameworkCoreModule),
         typeof(AbpAutofacModule),
-        typeof(AbpCachingStackExchangeRedisModule),
         typeof(AbpAspNetCoreSerilogModule),
         typeof(AbpSwashbuckleModule),
         typeof(AbpAspNetCoreMvcUiBasicThemeModule)
@@ -56,7 +52,6 @@ namespace EventHub.Admin
             ConfigureLocalization();
             ConfigureCache(configuration);
             ConfigureVirtualFileSystem(context);
-            ConfigureRedis(context, configuration);
             ConfigureCors(context, configuration);
             ConfigureCookies(context);
             ConfigureSwaggerServices(context, configuration);
@@ -143,16 +138,6 @@ namespace EventHub.Admin
             {
                 options.Languages.Add(new LanguageInfo("en", "en", "English", "gb"));
             });
-        }
-
-        private void ConfigureRedis(
-            ServiceConfigurationContext context,
-            IConfiguration configuration)
-        {
-            var redis = ConnectionMultiplexer.Connect(configuration["Redis:Configuration"]);
-            context.Services
-                .AddDataProtection()
-                .PersistKeysToStackExchangeRedis(redis, "EventHub-Protection-Keys");
         }
 
         private void ConfigureCors(ServiceConfigurationContext context, IConfiguration configuration)

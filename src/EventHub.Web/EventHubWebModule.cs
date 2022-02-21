@@ -7,7 +7,6 @@ using EventHub.Web.Theme;
 using EventHub.Web.Theme.Bundling;
 using EventHub.Web.Utils;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +15,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.OpenApi.Models;
 using Payment.Web;
-using StackExchange.Redis;
 using Volo.Abp;
 using Volo.Abp.Account;
 using Volo.Abp.AspNetCore.Authentication.OpenIdConnect;
@@ -29,7 +27,6 @@ using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Caching;
-using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.Http.Client;
 using Volo.Abp.Http.Client.IdentityModel.Web;
 using Volo.Abp.Modularity;
@@ -49,7 +46,6 @@ namespace EventHub.Web
         typeof(EventHubWebThemeModule),
         typeof(AbpAutofacModule),
         typeof(AbpAutoMapperModule),
-        typeof(AbpCachingStackExchangeRedisModule),
         typeof(AbpHttpClientIdentityModelWebModule),
         typeof(AbpAspNetCoreSerilogModule),
         typeof(AbpSwashbuckleModule),
@@ -79,7 +75,6 @@ namespace EventHub.Web
 
             ConfigureBundles();
             ConfigureCache(configuration);
-            ConfigureRedis(context, configuration);
             ConfigureUrls(configuration);
             ConfigureAuthentication(context, configuration);
             ConfigureAutoMapper();
@@ -223,16 +218,6 @@ namespace EventHub.Web
                     options.CustomSchemaIds(type => type.FullName);
                 }
             );
-        }
-
-        private void ConfigureRedis(
-            ServiceConfigurationContext context,
-            IConfiguration configuration)
-        {
-            var redis = ConnectionMultiplexer.Connect(configuration["Redis:Configuration"]);
-            context.Services
-                .AddDataProtection()
-                .PersistKeysToStackExchangeRedis(redis, "EventHub-Protection-Keys");
         }
 
         private void ConfigurePremiumPlanInfo(ServiceConfigurationContext context, IConfiguration configuration)

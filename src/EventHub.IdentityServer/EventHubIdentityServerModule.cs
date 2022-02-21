@@ -11,12 +11,10 @@ using IdentityServer4.Extensions;
 using Localization.Resources.AbpUi;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using StackExchange.Redis;
 using Volo.Abp;
 using Volo.Abp.Account;
 using Volo.Abp.Account.Web;
@@ -27,7 +25,6 @@ using Volo.Abp.Auditing;
 using Volo.Abp.Autofac;
 using Volo.Abp.BackgroundJobs;
 using Volo.Abp.Caching;
-using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.IdentityServer;
 using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
@@ -38,7 +35,6 @@ namespace EventHub
 {
     [DependsOn(
         typeof(AbpAutofacModule),
-        typeof(AbpCachingStackExchangeRedisModule),
         typeof(AbpAccountWebIdentityServerModule),
         typeof(AbpAccountApplicationModule),
         typeof(AbpAccountHttpApiModule), 
@@ -155,12 +151,7 @@ namespace EventHub
             {
                 options.KeyPrefix = "EventHub:";
             });
-
-            var redis = ConnectionMultiplexer.Connect(configuration["Redis:Configuration"]);
-            context.Services
-                .AddDataProtection()
-                .PersistKeysToStackExchangeRedis(redis, "EventHub-Protection-Keys");
-
+            
             context.Services.AddCors(options =>
             {
                 options.AddPolicy(DefaultCorsPolicyName, builder =>

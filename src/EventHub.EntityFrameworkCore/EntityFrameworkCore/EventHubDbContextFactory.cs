@@ -16,7 +16,7 @@ namespace EventHub.EntityFrameworkCore
             var configuration = BuildConfiguration();
 
             var builder = new DbContextOptionsBuilder<EventHubDbContext>()
-                .UseNpgsql(configuration.GetConnectionString("Default"));
+                .UseSqlServer(configuration.GetConnectionString("Default"));
 
             return new EventHubDbContext(builder.Options);
         }

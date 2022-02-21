@@ -5,7 +5,7 @@ using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.BlobStoring.Database.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
-using Volo.Abp.EntityFrameworkCore.PostgreSql;
+using Volo.Abp.EntityFrameworkCore.SqlServer;
 using Volo.Abp.Identity.EntityFrameworkCore;
 using Volo.Abp.IdentityServer.EntityFrameworkCore;
 using Volo.Abp.Modularity;
@@ -21,7 +21,7 @@ namespace EventHub.EntityFrameworkCore
         typeof(AbpIdentityServerEntityFrameworkCoreModule),
         typeof(AbpPermissionManagementEntityFrameworkCoreModule),
         typeof(AbpSettingManagementEntityFrameworkCoreModule),
-        typeof(AbpEntityFrameworkCorePostgreSqlModule),
+        typeof(AbpEntityFrameworkCoreSqlServerModule),
         typeof(AbpBackgroundJobsEntityFrameworkCoreModule),
         typeof(AbpAuditLoggingEntityFrameworkCoreModule),
         typeof(BlobStoringDatabaseEntityFrameworkCoreModule),
@@ -44,7 +44,7 @@ namespace EventHub.EntityFrameworkCore
 
             Configure<AbpDbContextOptions>(options =>
             {
-                options.UseNpgsql();
+                options.UseSqlServer();
             });
         }
     }
