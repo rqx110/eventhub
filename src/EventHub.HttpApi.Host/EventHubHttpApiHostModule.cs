@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using EventHub.EntityFrameworkCore;
 using EventHub.Events;
 using EventHub.Organizations;
+using EventHub.Organizations.Plans;
 using EventHub.Utils;
 using EventHub.Web;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -14,6 +16,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.Mvc;
@@ -58,6 +61,7 @@ namespace EventHub
             ConfigureBackgroundJobs();
             ConfigureAutoApiControllers();
             ConfigureTiming();
+            ConfigurePremiumPlanInfo(context, configuration);
         }
         
         private void ConfigureAutoApiControllers()
@@ -174,6 +178,20 @@ namespace EventHub
         private void ConfigureTiming()
         {
             Configure<AbpClockOptions>(options => { options.Kind = DateTimeKind.Utc; });
+        }
+        
+        private void ConfigurePremiumPlanInfo(ServiceConfigurationContext context, IConfiguration configuration)
+        {
+            context.Services.AddOptions<List<PlanInfoDefinition>>()
+                .Bind(configuration.GetSection(PlanInfoDefinition.PlanInfo))
+                .ValidateDataAnnotations()
+                .Validate(PlanInfoDefinition.IsValid, "PlanInfoDefinition is not valid!");
+
+            var planInfos = context.Services.GetRequiredServiceLazy<IOptions<List<PlanInfoDefinition>>>();
+            Configure<PlanInfoOptions>(options =>
+            {
+                options.AddPlanInfos(planInfos.Value.Value);
+            });
         }
 
         public override void OnApplicationInitialization(ApplicationInitializationContext context)

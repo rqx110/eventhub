@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using EventHub.Localization;
 using EventHub.Web.Menus;
-using EventHub.Web.PaymentRequests;
 using EventHub.Web.Theme;
 using EventHub.Web.Theme.Bundling;
 using EventHub.Web.Utils;
@@ -83,7 +82,6 @@ namespace EventHub.Web
             ConfigureCookies(context);
             ConfigureSwaggerServices(context.Services);
             ConfigureRazorPageOptions();
-            ConfigurePremiumPlanInfo(context, configuration);
         }
         
         private void ConfigureBundles()
@@ -220,30 +218,14 @@ namespace EventHub.Web
             );
         }
 
-        private void ConfigurePremiumPlanInfo(ServiceConfigurationContext context, IConfiguration configuration)
-        {
-            context.Services.AddOptions<PremiumPlanInfoOptions>()
-                .Bind(configuration.GetSection(PremiumPlanInfoOptions.OrganizationPlanInfo))
-                .ValidateDataAnnotations()
-                .Validate(config =>
-                {
-                    if (config.IsActive)
-                    {
-                        return config.OnePremiumPeriodAsMonth > config.CanBeExtendedAfterHowManyMonths;
-                    }
-
-                    return true;
-                }, "OnePremiumPeriodAsMonth must be greater than CanBeExtendedAfterHowManyMonths.");
-        }
-
         public override void OnApplicationInitialization(ApplicationInitializationContext context)
         {
             var app = context.GetApplicationBuilder();
             var env = context.GetEnvironment();
             
-            app.Use((context, next) =>
+            app.Use((httpContext, next) =>
             {
-                context.Request.Scheme = "https";
+                httpContext.Request.Scheme = "https";
                 return next();
             });
 

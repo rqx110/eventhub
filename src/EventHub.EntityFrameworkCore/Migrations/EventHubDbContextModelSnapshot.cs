@@ -376,10 +376,7 @@ namespace EventHub.Migrations
                         .HasDefaultValue(false)
                         .HasColumnName("IsDeleted");
 
-                    b.Property<bool>("IsPremium")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsSendPremiumReminderEmail")
+                    b.Property<bool>("IsSendPaidEnrollmentReminderEmail")
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastModificationTime")
@@ -404,8 +401,11 @@ namespace EventHub.Migrations
                     b.Property<Guid>("OwnerUserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("PremiumEndDate")
+                    b.Property<DateTime?>("PaidEnrollmentEndDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<byte>("PlanType")
+                        .HasColumnType("tinyint");
 
                     b.Property<string>("TwitterUsername")
                         .HasColumnType("nvarchar(max)");
